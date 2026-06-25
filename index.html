@@ -1,0 +1,2031 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OpticEMR — Ophthalmology Practice Management</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&family=Playfair+Display:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f4f6f9;
+    --surface: #ffffff;
+    --surface2: #f0f3f8;
+    --border: #dde3ee;
+    --accent: #1a56db;
+    --accent2: #0e3fa8;
+    --accent-light: #e8effe;
+    --green: #0d9448;
+    --green-light: #e6f7ee;
+    --amber: #d97706;
+    --amber-light: #fff7e6;
+    --red: #c0392b;
+    --red-light: #fdecea;
+    --text: #1a2035;
+    --text2: #4a5578;
+    --text3: #8892aa;
+    --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
+    --shadow-md: 0 4px 20px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.05);
+    --radius: 10px;
+    --radius-sm: 6px;
+    --sidebar-w: 230px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    font-size: 14px;
+  }
+
+  /* SIDEBAR */
+  .sidebar {
+    width: var(--sidebar-w);
+    background: #0f1c3f;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+
+  .sidebar-logo {
+    padding: 22px 20px 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+  }
+
+  .logo-mark {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .logo-icon {
+    width: 34px; height: 34px;
+    background: var(--accent);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+  }
+
+  .logo-text {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    font-weight: 600;
+    color: #fff;
+    letter-spacing: 0.2px;
+  }
+
+  .logo-sub {
+    font-size: 10px;
+    color: rgba(255,255,255,0.38);
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    margin-top: 1px;
+  }
+
+  .sidebar-section {
+    padding: 14px 10px 6px;
+  }
+
+  .sidebar-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.28);
+    padding: 0 10px;
+    margin-bottom: 4px;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 10px;
+    border-radius: 7px;
+    cursor: pointer;
+    color: rgba(255,255,255,0.6);
+    font-size: 13.5px;
+    font-weight: 400;
+    transition: all 0.15s;
+    margin-bottom: 1px;
+    user-select: none;
+  }
+
+  .nav-item:hover { background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.9); }
+  .nav-item.active { background: var(--accent); color: #fff; font-weight: 500; }
+
+  .nav-item .icon { font-size: 15px; width: 20px; text-align: center; flex-shrink: 0; }
+
+  .sidebar-footer {
+    margin-top: auto;
+    padding: 12px 10px;
+    border-top: 1px solid rgba(255,255,255,0.07);
+  }
+
+  .user-card {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 10px; border-radius: 7px;
+    cursor: pointer;
+  }
+  .user-avatar {
+    width: 30px; height: 30px; border-radius: 50%;
+    background: var(--accent); display: flex; align-items: center;
+    justify-content: center; font-size: 12px; font-weight: 600; color: #fff; flex-shrink: 0;
+  }
+  .user-info { overflow: hidden; }
+  .user-name { color: rgba(255,255,255,0.85); font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .user-role { color: rgba(255,255,255,0.38); font-size: 11px; }
+
+  /* MAIN */
+  .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+  .topbar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    height: 56px;
+    display: flex; align-items: center; gap: 16px;
+    flex-shrink: 0;
+  }
+
+  .page-title { font-size: 16px; font-weight: 600; color: var(--text); flex: 1; }
+
+  .search-box {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0 12px;
+    height: 34px;
+    min-width: 220px;
+  }
+
+  .search-box input {
+    border: none; background: transparent; outline: none;
+    font-family: inherit; font-size: 13px; color: var(--text);
+    width: 100%;
+  }
+  .search-box input::placeholder { color: var(--text3); }
+
+  .btn {
+    padding: 0 14px; height: 34px; border-radius: 7px;
+    font-family: inherit; font-size: 13px; font-weight: 500;
+    cursor: pointer; border: none; display: inline-flex; align-items: center; gap: 6px;
+    transition: all 0.15s; white-space: nowrap;
+  }
+
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:hover { background: var(--accent2); }
+  .btn-secondary { background: var(--surface2); color: var(--text2); border: 1px solid var(--border); }
+  .btn-secondary:hover { background: var(--border); }
+  .btn-ghost { background: transparent; color: var(--text2); }
+  .btn-ghost:hover { background: var(--surface2); }
+  .btn-danger { background: var(--red-light); color: var(--red); border: 1px solid rgba(192,57,43,0.2); }
+  .btn-danger:hover { background: #fad5d2; }
+
+  .content { flex: 1; overflow: auto; padding: 24px; }
+
+  /* CARDS */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+  }
+  .card-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 12px;
+  }
+  .card-title { font-size: 14px; font-weight: 600; color: var(--text); }
+  .card-body { padding: 20px; }
+
+  /* GRID */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+
+  /* STAT CARDS */
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    box-shadow: var(--shadow);
+  }
+  .stat-label { font-size: 12px; font-weight: 500; color: var(--text3); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 8px; }
+  .stat-value { font-size: 28px; font-weight: 600; color: var(--text); font-family: 'DM Mono', monospace; line-height: 1; }
+  .stat-change { font-size: 12px; color: var(--green); margin-top: 6px; display: flex; align-items: center; gap: 4px; }
+  .stat-change.down { color: var(--red); }
+
+  /* TABLE */
+  .data-table { width: 100%; border-collapse: collapse; }
+  .data-table th {
+    text-align: left; padding: 10px 16px;
+    font-size: 11px; font-weight: 600; letter-spacing: 0.7px;
+    text-transform: uppercase; color: var(--text3);
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+  }
+  .data-table td { padding: 12px 16px; border-bottom: 1px solid var(--border); font-size: 13.5px; color: var(--text); }
+  .data-table tr:last-child td { border-bottom: none; }
+  .data-table tbody tr { cursor: pointer; transition: background 0.1s; }
+  .data-table tbody tr:hover { background: var(--accent-light); }
+
+  /* BADGES */
+  .badge {
+    display: inline-flex; align-items: center;
+    padding: 3px 9px; border-radius: 20px;
+    font-size: 11.5px; font-weight: 500;
+  }
+  .badge-green { background: var(--green-light); color: var(--green); }
+  .badge-amber { background: var(--amber-light); color: var(--amber); }
+  .badge-red { background: var(--red-light); color: var(--red); }
+  .badge-blue { background: var(--accent-light); color: var(--accent); }
+  .badge-gray { background: var(--surface2); color: var(--text2); }
+
+  /* FORM */
+  .form-group { margin-bottom: 16px; }
+  .form-label { display: block; font-size: 12.5px; font-weight: 500; color: var(--text2); margin-bottom: 5px; }
+  .form-input, .form-select, .form-textarea {
+    width: 100%; padding: 8px 11px;
+    border: 1px solid var(--border); border-radius: var(--radius-sm);
+    font-family: inherit; font-size: 13.5px; color: var(--text);
+    background: var(--surface); outline: none;
+    transition: border-color 0.15s;
+  }
+  .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(26,86,219,0.08); }
+  .form-textarea { resize: vertical; min-height: 80px; line-height: 1.5; }
+  .form-row { display: grid; gap: 12px; }
+  .form-row.cols-2 { grid-template-columns: 1fr 1fr; }
+  .form-row.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+
+  /* MODAL */
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.45);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 1000; backdrop-filter: blur(2px);
+    animation: fadeIn 0.15s ease;
+  }
+  .modal {
+    background: var(--surface); border-radius: 12px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    max-height: 90vh; overflow: auto;
+    animation: slideUp 0.2s ease;
+    width: 100%; max-width: 700px; margin: 20px;
+  }
+  .modal-lg { max-width: 900px; }
+  .modal-header {
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; background: var(--surface); z-index: 1;
+  }
+  .modal-title { font-size: 16px; font-weight: 600; }
+  .modal-body { padding: 24px; }
+  .modal-footer { padding: 16px 24px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 10px; }
+  .close-btn { cursor: pointer; color: var(--text3); font-size: 20px; line-height: 1; background: none; border: none; padding: 4px; }
+  .close-btn:hover { color: var(--text); }
+
+  /* PAGES */
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* EYE CHART */
+  .eye-section {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+  }
+  .eye-label {
+    font-size: 11px; font-weight: 700; letter-spacing: 1.5px;
+    text-transform: uppercase; color: var(--accent);
+    margin-bottom: 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .eye-label::after {
+    content: ''; flex: 1; height: 1px; background: var(--border);
+  }
+
+  /* VISUAL ACUITY */
+  .va-chart {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px; line-height: 2;
+    color: var(--text3);
+  }
+  .va-row { display: flex; align-items: center; gap: 12px; }
+  .va-snellen { font-weight: 600; color: var(--text2); min-width: 50px; }
+
+  /* TABS */
+  .tabs { display: flex; gap: 0; border-bottom: 2px solid var(--border); margin-bottom: 20px; }
+  .tab {
+    padding: 10px 18px; font-size: 13.5px; font-weight: 500;
+    color: var(--text3); cursor: pointer;
+    border-bottom: 2px solid transparent; margin-bottom: -2px;
+    transition: all 0.15s; white-space: nowrap;
+  }
+  .tab:hover { color: var(--text2); }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  /* PATIENT CHART HEADER */
+  .patient-banner {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px 24px;
+    margin-bottom: 16px;
+    display: flex; align-items: center; gap: 20px;
+    box-shadow: var(--shadow);
+  }
+  .patient-avatar-lg {
+    width: 56px; height: 56px; border-radius: 50%;
+    background: linear-gradient(135deg, #1a56db, #0e3fa8);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; font-weight: 600; color: #fff; flex-shrink: 0;
+  }
+  .patient-info h2 { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
+  .patient-meta { font-size: 12.5px; color: var(--text3); display: flex; gap: 16px; flex-wrap: wrap; }
+  .patient-meta span { display: flex; align-items: center; gap: 4px; }
+
+  .section-title {
+    font-size: 13px; font-weight: 600; color: var(--text2);
+    text-transform: uppercase; letter-spacing: 0.8px;
+    margin-bottom: 12px;
+  }
+
+  /* APPOINTMENT SLOTS */
+  .time-slots { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .slot {
+    padding: 8px 6px; text-align: center; border-radius: 6px;
+    font-size: 12px; font-weight: 500; cursor: pointer;
+    border: 1px solid var(--border); transition: all 0.15s;
+  }
+  .slot.available:hover { background: var(--accent-light); border-color: var(--accent); color: var(--accent); }
+  .slot.booked { background: var(--accent-light); color: var(--accent); border-color: var(--accent); cursor: default; }
+  .slot.past { background: var(--surface2); color: var(--text3); cursor: default; }
+
+  /* DIAGRAM */
+  .fundus-container { display: flex; justify-content: center; gap: 40px; padding: 10px 0; }
+  .eye-diagram {
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+  }
+  .eye-diagram svg { border-radius: 50%; box-shadow: 0 0 0 2px var(--border); }
+  .eye-diagram-label { font-size: 11px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 1px; }
+
+  /* SNELLEN chart mini */
+  .snellen-mini {
+    text-align: center; font-family: 'DM Mono', monospace;
+    letter-spacing: 4px; line-height: 1.5;
+  }
+
+  /* ALERTS */
+  .alert { padding: 12px 16px; border-radius: 8px; font-size: 13px; display: flex; align-items: flex-start; gap: 10px; margin-bottom: 12px; }
+  .alert-warning { background: var(--amber-light); border: 1px solid rgba(217,119,6,0.2); color: #7a4f00; }
+  .alert-info { background: var(--accent-light); border: 1px solid rgba(26,86,219,0.2); color: var(--accent2); }
+  .alert-danger { background: var(--red-light); border: 1px solid rgba(192,57,43,0.2); color: var(--red); }
+
+  /* IRIDESCENT TOP BORDER */
+  .card.accent-top { border-top: 3px solid var(--accent); }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--text3); }
+
+  /* ANIMATIONS */
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes slideUp { from { transform: translateY(16px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+  /* Divider */
+  .divider { height: 1px; background: var(--border); margin: 16px 0; }
+
+  /* IOP display */
+  .iop-value {
+    font-family: 'DM Mono', monospace;
+    font-size: 32px; font-weight: 600; color: var(--text);
+    line-height: 1;
+  }
+  .iop-unit { font-size: 13px; color: var(--text3); font-family: 'DM Sans', sans-serif; }
+
+  /* Print hidden */
+  @media print {
+    .sidebar, .topbar { display: none; }
+    .content { padding: 0; }
+    .modal-overlay { position: relative; background: none; }
+  }
+
+  .highlight-row td { background: #fffbf0 !important; }
+
+  /* Tooltip */
+  .tooltip-wrap { position: relative; display: inline-flex; }
+  .tooltip {
+    position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%);
+    background: var(--text); color: #fff; padding: 5px 9px; border-radius: 5px;
+    font-size: 11.5px; white-space: nowrap; pointer-events: none;
+    opacity: 0; transition: opacity 0.15s; z-index: 100;
+  }
+  .tooltip-wrap:hover .tooltip { opacity: 1; }
+
+  .empty-state {
+    text-align: center; padding: 48px 20px; color: var(--text3);
+  }
+  .empty-state .empty-icon { font-size: 36px; margin-bottom: 12px; }
+  .empty-state p { font-size: 14px; }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-mark">
+      <div class="logo-icon">👁</div>
+      <div>
+        <div class="logo-text">OpticEMR</div>
+        <div class="logo-sub">Ophthalmology Suite</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-label">Main</div>
+    <div class="nav-item active" onclick="showPage('dashboard', this)"><span class="icon">⊞</span> Dashboard</div>
+    <div class="nav-item" onclick="showPage('patients', this)"><span class="icon">👤</span> Patients</div>
+    <div class="nav-item" onclick="showPage('appointments', this)"><span class="icon">📅</span> Schedule</div>
+    <div class="nav-item" onclick="showPage('encounters', this)"><span class="icon">📋</span> Encounters</div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-label">Clinical</div>
+    <div class="nav-item" onclick="showPage('exams', this)"><span class="icon">🔬</span> Eye Exams</div>
+    <div class="nav-item" onclick="showPage('imaging', this)"><span class="icon">📷</span> Imaging</div>
+    <div class="nav-item" onclick="showPage('prescriptions', this)"><span class="icon">💊</span> Prescriptions</div>
+    <div class="nav-item" onclick="showPage('surgical', this)"><span class="icon">⚕</span> Surgical Log</div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-label">Admin</div>
+    <div class="nav-item" onclick="showPage('billing', this)"><span class="icon">💳</span> Billing</div>
+    <div class="nav-item" onclick="showPage('reports', this)"><span class="icon">📊</span> Reports</div>
+  </div>
+
+  <div class="sidebar-footer">
+    <div class="user-card">
+      <div class="user-avatar">CC</div>
+      <div class="user-info">
+        <div class="user-name">Dr. Cyrille Cabrera</div>
+        <div class="user-role">Attending Ophthalmologist</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN CONTENT -->
+<div class="main">
+  <div class="topbar">
+    <div class="page-title" id="topbar-title">Dashboard</div>
+    <div class="search-box">
+      <span style="color:var(--text3)">🔍</span>
+      <input type="text" placeholder="Search patients, records…" id="global-search" oninput="globalSearch(this.value)">
+    </div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <div style="display:flex;flex-direction:column;align-items:flex-end">
+        <span id="last-saved-label" style="font-size:10.5px;color:var(--text3);white-space:nowrap;letter-spacing:0.3px">Not saved yet</span>
+        <span id="save-status" style="font-size:10.5px;color:var(--green);white-space:nowrap;min-height:14px"></span>
+      </div>
+      <button class="btn btn-secondary" onclick="saveToFile()" title="Save all data as OpticEMR-data.json — move this file to iCloud Drive to sync with iPad">💾 Save</button>
+      <button class="btn btn-secondary" onclick="document.getElementById('load-file-input').click()" title="Load OpticEMR-data.json from iCloud Drive or your computer">📂 Load</button>
+      <button class="btn btn-ghost" onclick="showICloudGuide()" title="How to use iCloud Drive" style="padding:0 8px;font-size:16px">☁️</button>
+      <input type="file" id="load-file-input" accept=".json" style="display:none" onchange="loadFromFile(event)">
+    </div>
+    <button class="btn btn-primary" onclick="quickNewPatient()">+ New Patient</button>
+  </div>
+
+  <div class="content">
+
+    <!-- ===== DASHBOARD ===== -->
+    <div class="page active" id="page-dashboard">
+      <div class="grid-4" style="margin-bottom:20px">
+        <div class="stat-card">
+          <div class="stat-label">Today's Appointments</div>
+          <div class="stat-value" id="stat-appts">0</div>
+          <div class="stat-change" id="stat-appts-sub">No appointments today</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Total Patients</div>
+          <div class="stat-value" id="stat-patients">0</div>
+          <div class="stat-change" id="stat-patients-sub">No patients yet</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Total Encounters</div>
+          <div class="stat-value" id="stat-encounters">0</div>
+          <div class="stat-change" id="stat-encounters-sub">No encounters yet</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Prescriptions Issued</div>
+          <div class="stat-value" id="stat-rx">0</div>
+          <div class="stat-change" id="stat-rx-sub">No prescriptions yet</div>
+        </div>
+      </div>
+
+      <div class="grid-2" style="margin-bottom:20px">
+        <div class="card">
+          <div class="card-header">
+            <span style="font-size:16px">📅</span>
+            <div class="card-title">Today's Schedule</div>
+            <div style="margin-left:auto;font-size:12px;color:var(--text3)">Sun, Apr 12</div>
+          </div>
+          <div style="overflow:auto;max-height:320px">
+            <table class="data-table">
+              <thead>
+                <tr><th>Time</th><th>Patient</th><th>Type</th><th>Status</th></tr>
+              </thead>
+              <tbody id="today-schedule">
+              </tbody>
+            </table>
+            <div id="today-schedule-empty" class="empty-state" style="padding:32px 20px">
+              <div class="empty-icon">📅</div>
+              <p>No appointments booked yet.<br>Use the Schedule tab to add appointments.</p>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <div class="card">
+            <div class="card-header">
+              <span style="font-size:16px">⚠️</span>
+              <div class="card-title">Alerts & Flags</div>
+            </div>
+            <div class="card-body" style="padding:14px">
+              <div id="alerts-empty" class="empty-state" style="padding:20px">
+                <div class="empty-icon">✅</div>
+                <p>No active alerts.</p>
+              </div>
+              <div id="alerts-list"></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <span style="font-size:16px">📊</span>
+              <div class="card-title">Dx Distribution (MTD)</div>
+            </div>
+            <div class="card-body">
+              <div id="dx-chart"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== PATIENTS ===== -->
+    <div class="page" id="page-patients">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-secondary" onclick="filterPatients('all')" id="filter-all" style="background:var(--accent);color:#fff;border-color:var(--accent)">All</button>
+          <button class="btn btn-secondary" onclick="filterPatients('glaucoma')" id="filter-glaucoma">Glaucoma</button>
+          <button class="btn btn-secondary" onclick="filterPatients('diabetic')" id="filter-diabetic">Diabetic</button>
+          <button class="btn btn-secondary" onclick="filterPatients('cataract')" id="filter-cataract">Cataract</button>
+        </div>
+        <button class="btn btn-primary" onclick="showNewPatientModal()">+ Add Patient</button>
+      </div>
+      <div class="card">
+        <table class="data-table">
+          <thead>
+            <tr><th>Name</th><th>DOB / Age</th><th>MRN</th><th>Primary Dx</th><th>Last Visit</th><th>Next Appt</th><th>Actions</th></tr>
+          </thead>
+          <tbody id="patient-table-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ===== APPOINTMENTS ===== -->
+    <div class="page" id="page-appointments">
+      <div style="display:flex;gap:16px;margin-bottom:20px;align-items:center">
+        <button class="btn btn-secondary" onclick="changeWeek(-1)">← Prev</button>
+        <div style="font-size:15px;font-weight:600;flex:1;text-align:center" id="week-label">Week of Apr 7, 2026</div>
+        <button class="btn btn-secondary" onclick="changeWeek(1)">Next →</button>
+        <button class="btn btn-primary" onclick="showBookModal()">+ Book Appointment</button>
+      </div>
+      <div class="card">
+        <div id="week-calendar" style="overflow:auto"></div>
+      </div>
+    </div>
+
+    <!-- ===== ENCOUNTERS ===== -->
+    <div class="page" id="page-encounters">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+        <div style="font-size:13px;color:var(--text3)">All clinical encounters, sorted by date</div>
+        <button class="btn btn-primary" onclick="showNewEncounterModal()">+ New Encounter</button>
+      </div>
+      <div class="card">
+        <table class="data-table">
+          <thead><tr><th>Date</th><th>Patient</th><th>Type</th><th>Provider</th><th>ICD-10</th><th>Status</th><th></th></tr></thead>
+          <tbody id="encounter-table-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ===== EYE EXAMS ===== -->
+    <div class="page" id="page-exams">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+        <div style="font-size:13px;color:var(--text3)">Comprehensive ophthalmic examination records</div>
+        <button class="btn btn-primary" onclick="showExamModal()">+ New Exam</button>
+      </div>
+      <div id="exam-list"></div>
+    </div>
+
+    <!-- ===== IMAGING ===== -->
+    <div class="page" id="page-imaging">
+      <div class="grid-3">
+        <div class="card accent-top">
+          <div class="card-header"><span style="font-size:16px">📸</span><div class="card-title">Fundus Photography</div></div>
+          <div class="card-body">
+            <div class="fundus-container">
+              <div class="eye-diagram">
+                <svg width="100" height="100" viewBox="0 0 100 100">
+                  <circle cx="50" cy="50" r="48" fill="#1a0a00"/>
+                  <circle cx="50" cy="50" r="30" fill="#8B4513" opacity="0.6"/>
+                  <circle cx="50" cy="50" r="14" fill="#2d1a00"/>
+                  <circle cx="44" cy="44" r="5" fill="white" opacity="0.7"/>
+                  <!-- blood vessels -->
+                  <path d="M50 36 Q60 45 55 58" stroke="#cc2222" stroke-width="1.5" fill="none" opacity="0.7"/>
+                  <path d="M50 36 Q40 45 45 58" stroke="#cc2222" stroke-width="1.5" fill="none" opacity="0.7"/>
+                  <path d="M50 36 Q65 50 68 55" stroke="#cc2222" stroke-width="1" fill="none" opacity="0.5"/>
+                  <path d="M50 36 Q35 50 32 55" stroke="#cc2222" stroke-width="1" fill="none" opacity="0.5"/>
+                  <!-- optic disc -->
+                  <circle cx="65" cy="50" r="7" fill="#f5e6c8" opacity="0.9"/>
+                  <circle cx="65" cy="50" r="3" fill="#f0d49a"/>
+                </svg>
+                <div class="eye-diagram-label">OD</div>
+              </div>
+              <div class="eye-diagram">
+                <svg width="100" height="100" viewBox="0 0 100 100">
+                  <circle cx="50" cy="50" r="48" fill="#1a0a00"/>
+                  <circle cx="50" cy="50" r="30" fill="#8B4513" opacity="0.6"/>
+                  <circle cx="50" cy="50" r="14" fill="#2d1a00"/>
+                  <circle cx="44" cy="44" r="5" fill="white" opacity="0.7"/>
+                  <path d="M50 36 Q60 45 55 58" stroke="#cc2222" stroke-width="1.5" fill="none" opacity="0.7"/>
+                  <path d="M50 36 Q40 45 45 58" stroke="#cc2222" stroke-width="1.5" fill="none" opacity="0.7"/>
+                  <path d="M50 36 Q35 50 32 55" stroke="#cc2222" stroke-width="1" fill="none" opacity="0.5"/>
+                  <circle cx="35" cy="50" r="7" fill="#f5e6c8" opacity="0.9"/>
+                  <circle cx="35" cy="50" r="3" fill="#f0d49a"/>
+                </svg>
+                <div class="eye-diagram-label">OS</div>
+              </div>
+            </div>
+            <div style="text-align:center;font-size:11.5px;color:var(--text3);margin-top:8px">Marcus Chen · Apr 10, 2026</div>
+          </div>
+        </div>
+
+        <div class="card accent-top">
+          <div class="card-header"><span style="font-size:16px">🌊</span><div class="card-title">OCT — Macula</div></div>
+          <div class="card-body">
+            <svg width="100%" height="110" viewBox="0 0 260 110" style="display:block">
+              <rect width="260" height="110" fill="#0a0a1a" rx="4"/>
+              <!-- Simulated OCT layers -->
+              <path d="M0 20 Q65 15 130 22 Q195 29 260 20" stroke="#4488ff" stroke-width="1.5" fill="none" opacity="0.6"/>
+              <path d="M0 35 Q65 28 130 38 Q195 46 260 35" stroke="#66aaff" stroke-width="2" fill="none" opacity="0.8"/>
+              <path d="M0 55 Q50 48 90 52 Q110 54 130 60 Q150 66 170 52 Q210 40 260 55" stroke="#88ccff" stroke-width="2.5" fill="none"/>
+              <path d="M0 68 Q65 62 130 75 Q195 82 260 68" stroke="#44aadd" stroke-width="1.5" fill="none" opacity="0.7"/>
+              <path d="M0 80 Q65 76 130 88 Q195 96 260 80" stroke="#3388bb" stroke-width="1" fill="none" opacity="0.5"/>
+              <path d="M0 90 Q65 87 130 96 Q195 100 260 90" stroke="#226688" stroke-width="1" fill="none" opacity="0.4"/>
+              <!-- Foveal dip -->
+              <ellipse cx="130" cy="60" rx="18" ry="6" fill="rgba(100,180,255,0.15)"/>
+              <!-- scale bar -->
+              <line x1="200" y1="100" x2="240" y2="100" stroke="white" stroke-width="1" opacity="0.4"/>
+              <text x="220" y="108" fill="white" font-size="7" text-anchor="middle" opacity="0.4">200µm</text>
+            </svg>
+            <div style="text-align:center;font-size:11.5px;color:var(--text3);margin-top:8px">Eleanor Voss · Normal foveal contour</div>
+          </div>
+        </div>
+
+        <div class="card accent-top">
+          <div class="card-header"><span style="font-size:16px">⭕</span><div class="card-title">Visual Field (HVF)</div></div>
+          <div class="card-body">
+            <svg width="100%" height="110" viewBox="0 0 180 110" style="display:block;margin:0 auto">
+              <rect width="180" height="110" fill="#f8f8f8" rx="4"/>
+              <ellipse cx="90" cy="55" rx="70" ry="48" fill="none" stroke="#dde3ee" stroke-width="1"/>
+              <ellipse cx="90" cy="55" rx="50" ry="34" fill="none" stroke="#dde3ee" stroke-width="1"/>
+              <ellipse cx="90" cy="55" rx="30" ry="20" fill="none" stroke="#dde3ee" stroke-width="1"/>
+              <!-- field defect - superior nasal step -->
+              <path d="M90 7 Q115 10 130 35 Q120 32 110 38 Q100 30 90 30 Z" fill="rgba(0,0,0,0.75)" opacity="0.8"/>
+              <path d="M90 30 Q100 30 110 38 Q105 45 95 50 Q90 45 90 40 Z" fill="rgba(0,0,0,0.5)" opacity="0.7"/>
+              <!-- blind spot -->
+              <circle cx="118" cy="55" r="6" fill="rgba(0,0,0,0.9)"/>
+              <!-- center fixation -->
+              <circle cx="90" cy="55" r="2" fill="#1a56db"/>
+              <line x1="85" y1="55" x2="95" y2="55" stroke="#1a56db" stroke-width="1"/>
+              <line x1="90" y1="50" x2="90" y2="60" stroke="#1a56db" stroke-width="1"/>
+            </svg>
+            <div style="text-align:center;font-size:11.5px;color:var(--text3);margin-top:8px">Marcus Chen OD · Superior nasal step</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-2" style="margin-top:16px">
+        <div class="card">
+          <div class="card-header"><span style="font-size:16px">📐</span><div class="card-title">Corneal Topography</div></div>
+          <div class="card-body">
+            <svg width="100%" height="120" viewBox="0 0 200 120">
+              <defs>
+                <radialGradient id="topo" cx="50%" cy="50%">
+                  <stop offset="0%" stop-color="#ff4444"/>
+                  <stop offset="20%" stop-color="#ff8800"/>
+                  <stop offset="40%" stop-color="#ffdd00"/>
+                  <stop offset="60%" stop-color="#44cc44"/>
+                  <stop offset="80%" stop-color="#2299ff"/>
+                  <stop offset="100%" stop-color="#0044aa"/>
+                </radialGradient>
+              </defs>
+              <ellipse cx="100" cy="60" rx="70" ry="54" fill="url(#topo)" opacity="0.85"/>
+              <!-- contour lines -->
+              <ellipse cx="100" cy="60" rx="56" ry="43" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="0.8"/>
+              <ellipse cx="100" cy="60" rx="42" ry="32" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="0.8"/>
+              <ellipse cx="100" cy="60" rx="28" ry="22" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="0.8"/>
+              <ellipse cx="100" cy="60" rx="14" ry="11" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="0.8"/>
+              <!-- scale -->
+              <rect x="155" y="10" width="12" height="100" rx="2" fill="url(#topo)" opacity="0.85"/>
+              <text x="170" y="14" font-size="7" fill="var(--text2)">50D</text>
+              <text x="170" y="112" font-size="7" fill="var(--text2)">38D</text>
+            </svg>
+            <div style="text-align:center;font-size:11.5px;color:var(--text3)">Thomas Nakamura OD · SimK: 43.5 / 44.2 D</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><span style="font-size:16px">📋</span><div class="card-title">Recent Imaging Studies</div></div>
+          <div style="overflow:auto;max-height:200px">
+            <table class="data-table">
+              <thead><tr><th>Date</th><th>Patient</th><th>Study</th><th>Eye</th><th>Finding</th></tr></thead>
+              <tbody>
+                <tr><td style="font-family:'DM Mono',monospace;font-size:12px">04/12</td><td>E. Voss</td><td>OCT Macula</td><td>OU</td><td><span class="badge badge-green">Normal</span></td></tr>
+                <tr><td style="font-family:'DM Mono',monospace;font-size:12px">04/10</td><td>M. Chen</td><td>Fundus Photo</td><td>OD</td><td><span class="badge badge-amber">CDR 0.7</span></td></tr>
+                <tr><td style="font-family:'DM Mono',monospace;font-size:12px">04/10</td><td>M. Chen</td><td>HVF 24-2</td><td>OD</td><td><span class="badge badge-red">Defect</span></td></tr>
+                <tr><td style="font-family:'DM Mono',monospace;font-size:12px">04/08</td><td>T. Nakamura</td><td>Topography</td><td>OU</td><td><span class="badge badge-green">Regular</span></td></tr>
+                <tr><td style="font-family:'DM Mono',monospace;font-size:12px">04/07</td><td>P. Okonkwo</td><td>OCT Nerve</td><td>OU</td><td><span class="badge badge-green">Normal</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== PRESCRIPTIONS ===== -->
+    <div class="page" id="page-prescriptions">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+        <div style="font-size:13px;color:var(--text3)">Spectacle, contact lens, and medication prescriptions</div>
+        <button class="btn btn-primary" onclick="showRxModal()">+ New Rx</button>
+      </div>
+      <div id="rx-list"></div>
+    </div>
+
+    <!-- ===== SURGICAL LOG ===== -->
+    <div class="page" id="page-surgical">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+        <div style="font-size:13px;color:var(--text3)">Surgical procedures and outcomes</div>
+        <button class="btn btn-primary" onclick="showSurgicalModal()">+ Log Procedure</button>
+      </div>
+      <div class="card">
+        <table class="data-table">
+          <thead><tr><th>Date</th><th>Patient</th><th>Procedure</th><th>Eye</th><th>Surgeon</th><th>Outcome</th><th>Notes</th></tr></thead>
+          <tbody id="surgical-table-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ===== BILLING ===== -->
+    <div class="page" id="page-billing">
+      <div class="grid-4" style="margin-bottom:20px">
+        <div class="stat-card"><div class="stat-label">Outstanding</div><div class="stat-value">$8,420</div><div class="stat-change down" style="color:var(--amber)">12 invoices</div></div>
+        <div class="stat-card"><div class="stat-label">Collected (MTD)</div><div class="stat-value">$42k</div><div class="stat-change">▲ 8%</div></div>
+        <div class="stat-card"><div class="stat-label">Claims Pending</div><div class="stat-value">7</div><div class="stat-change">3 Medicare</div></div>
+        <div class="stat-card"><div class="stat-label">Avg Copay</div><div class="stat-value">$38</div><div class="stat-change">▲ stable</div></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span style="font-size:16px">💳</span><div class="card-title">Recent Claims</div></div>
+        <table class="data-table">
+          <thead><tr><th>Claim #</th><th>Patient</th><th>Date</th><th>CPT</th><th>Amount</th><th>Insurance</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td style="font-family:'DM Mono',monospace;font-size:12px">#2026-0412</td><td>E. Voss</td><td>04/12</td><td>92004</td><td>$285.00</td><td>Blue Cross</td><td><span class="badge badge-green">Paid</span></td></tr>
+            <tr><td style="font-family:'DM Mono',monospace;font-size:12px">#2026-0411</td><td>M. Chen</td><td>04/10</td><td>92014</td><td>$195.00</td><td>Medicare</td><td><span class="badge badge-amber">Pending</span></td></tr>
+            <tr><td style="font-family:'DM Mono',monospace;font-size:12px">#2026-0410</td><td>P. Okonkwo</td><td>04/10</td><td>66984</td><td>$2,400.00</td><td>Aetna</td><td><span class="badge badge-green">Paid</span></td></tr>
+            <tr><td style="font-family:'DM Mono',monospace;font-size:12px">#2026-0409</td><td>T. Nakamura</td><td>04/08</td><td>92025</td><td>$145.00</td><td>United</td><td><span class="badge badge-amber">Pending</span></td></tr>
+            <tr><td style="font-family:'DM Mono',monospace;font-size:12px">#2026-0408</td><td>S. Reyes</td><td>04/07</td><td>92250</td><td>$165.00</td><td>Medicaid</td><td><span class="badge badge-red">Denied</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ===== REPORTS ===== -->
+    <div class="page" id="page-reports">
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header"><span style="font-size:16px">📈</span><div class="card-title">Monthly Visit Volume</div></div>
+          <div class="card-body">
+            <div id="visit-bar-chart" style="display:flex;align-items:flex-end;gap:8px;height:120px">
+              <!-- rendered by JS -->
+            </div>
+            <div style="display:flex;gap:8px;margin-top:6px;font-size:11px;color:var(--text3)" id="bar-labels"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span style="font-size:16px">🏥</span><div class="card-title">Diagnosis Breakdown</div></div>
+          <div class="card-body" id="dx-breakdown"></div>
+        </div>
+        <div class="card" style="grid-column:span 2">
+          <div class="card-header"><span style="font-size:16px">👥</span><div class="card-title">Patient Demographics</div></div>
+          <div class="card-body">
+            <div class="grid-3">
+              <div>
+                <div class="section-title">Age Groups</div>
+                <div id="age-demo"></div>
+              </div>
+              <div>
+                <div class="section-title">Insurance</div>
+                <div id="ins-demo"></div>
+              </div>
+              <div>
+                <div class="section-title">Top Diagnoses</div>
+                <div id="top-dx"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end content -->
+</div><!-- end main -->
+
+<!-- ===== MODALS ===== -->
+
+<!-- New Patient Modal -->
+<div class="modal-overlay" id="modal-patient" style="display:none" onclick="closeModal('modal-patient', event)">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <div class="modal-title">New Patient Registration</div>
+      <button class="close-btn" onclick="closeModal('modal-patient')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="tabs" id="patient-form-tabs">
+        <div class="tab active" onclick="switchTab('patient-form-tabs','tab-demographics',this)">Demographics</div>
+        <div class="tab" onclick="switchTab('patient-form-tabs','tab-history',this)">Medical History</div>
+        <div class="tab" onclick="switchTab('patient-form-tabs','tab-insurance',this)">Insurance</div>
+      </div>
+      <!-- Demographics Tab -->
+      <div id="tab-demographics">
+        <div class="form-row cols-3">
+          <div class="form-group"><label class="form-label">First Name *</label><input class="form-input" id="pt-fname" placeholder="Jane"/></div>
+          <div class="form-group"><label class="form-label">Middle Name</label><input class="form-input" id="pt-mname" placeholder="M."/></div>
+          <div class="form-group"><label class="form-label">Last Name *</label><input class="form-input" id="pt-lname" placeholder="Doe"/></div>
+        </div>
+        <div class="form-row cols-3">
+          <div class="form-group"><label class="form-label">Date of Birth *</label><input class="form-input" id="pt-dob" type="date"/></div>
+          <div class="form-group"><label class="form-label">Gender</label>
+            <select class="form-select" id="pt-gender"><option>Male</option><option>Female</option><option>Non-binary</option><option>Prefer not to say</option></select>
+          </div>
+          <div class="form-group"><label class="form-label">Phone</label><input class="form-input" id="pt-phone" placeholder="(555) 000-0000"/></div>
+        </div>
+        <div class="form-row cols-2">
+          <div class="form-group"><label class="form-label">Email</label><input class="form-input" id="pt-email" placeholder="jane@email.com" type="email"/></div>
+          <div class="form-group"><label class="form-label">Referring Physician</label><input class="form-input" id="pt-ref" placeholder="Dr. Smith"/></div>
+        </div>
+        <div class="form-group"><label class="form-label">Address</label><input class="form-input" id="pt-address" placeholder="123 Main St, City, ST 00000"/></div>
+      </div>
+      <!-- History Tab -->
+      <div id="tab-history" style="display:none">
+        <div class="form-row cols-2">
+          <div class="form-group"><label class="form-label">Chief Complaint</label><textarea class="form-textarea" id="pt-cc" placeholder="Reason for visit…"></textarea></div>
+          <div class="form-group"><label class="form-label">Ocular History</label><textarea class="form-textarea" id="pt-ocular-hx" placeholder="Previous eye conditions, surgeries…"></textarea></div>
+        </div>
+        <div class="form-row cols-2">
+          <div class="form-group"><label class="form-label">Systemic Medical History</label><textarea class="form-textarea" id="pt-medical-hx" placeholder="Diabetes, hypertension, autoimmune…"></textarea></div>
+          <div class="form-group"><label class="form-label">Current Medications</label><textarea class="form-textarea" id="pt-meds" placeholder="List medications and dosages…"></textarea></div>
+        </div>
+        <div class="form-row cols-2">
+          <div class="form-group"><label class="form-label">Allergies</label><input class="form-input" id="pt-allergy" placeholder="NKDA / list allergies"/></div>
+          <div class="form-group"><label class="form-label">Family Ocular History</label><input class="form-input" id="pt-family-hx" placeholder="Glaucoma, AMD, RD…"/></div>
+        </div>
+      </div>
+      <!-- Insurance Tab -->
+      <div id="tab-insurance" style="display:none">
+        <div class="form-row cols-2">
+          <div class="form-group"><label class="form-label">Primary Insurance</label><input class="form-input" id="pt-ins-name" placeholder="Blue Cross Blue Shield"/></div>
+          <div class="form-group"><label class="form-label">Policy / Member ID</label><input class="form-input" id="pt-ins-id" placeholder="XYZ123456789"/></div>
+        </div>
+        <div class="form-row cols-2">
+          <div class="form-group"><label class="form-label">Group Number</label><input class="form-input" id="pt-ins-grp" placeholder="GRP00000"/></div>
+          <div class="form-group"><label class="form-label">Subscriber Name</label><input class="form-input" id="pt-ins-sub" placeholder="Same as patient / other"/></div>
+        </div>
+        <div class="form-row cols-2">
+          <div class="form-group"><label class="form-label">Secondary Insurance</label><input class="form-input" id="pt-ins2-name" placeholder="Medicare / None"/></div>
+          <div class="form-group"><label class="form-label">Copay Amount</label><input class="form-input" id="pt-copay" placeholder="$35"/></div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-patient')">Cancel</button>
+      <button class="btn btn-primary" onclick="savePatient()">Register Patient</button>
+    </div>
+  </div>
+</div>
+
+<!-- New Exam Modal -->
+<div class="modal-overlay" id="modal-exam" style="display:none" onclick="closeModal('modal-exam', event)">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <div class="modal-title">Comprehensive Eye Examination</div>
+      <button class="close-btn" onclick="closeModal('modal-exam')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="tabs" id="exam-tabs">
+        <div class="tab active" onclick="switchTab('exam-tabs','exam-tab-va',this)">Visual Acuity</div>
+        <div class="tab" onclick="switchTab('exam-tabs','exam-tab-refraction',this)">Refraction</div>
+        <div class="tab" onclick="switchTab('exam-tabs','exam-tab-slitlamp',this)">Slit Lamp</div>
+        <div class="tab" onclick="switchTab('exam-tabs','exam-tab-fundus',this)">Fundus</div>
+        <div class="tab" onclick="switchTab('exam-tabs','exam-tab-iop',this)">IOP & Fields</div>
+        <div class="tab" onclick="switchTab('exam-tabs','exam-tab-plan',this)">A/P</div>
+      </div>
+
+      <!-- VA Tab -->
+      <div id="exam-tab-va">
+        <div class="form-row cols-2">
+          <div class="form-group"><label class="form-label">Patient</label>
+            <select class="form-select" id="exam-patient"><option>-- Select Patient --</option></select>
+          </div>
+          <div class="form-group"><label class="form-label">Exam Date</label><input class="form-input" id="exam-date" type="date"/></div>
+        </div>
+        <div class="eye-section">
+          <div>
+            <div class="eye-label">OD — Right Eye</div>
+            <div class="form-row cols-2">
+              <div class="form-group"><label class="form-label">VA Sc (without correction)</label>
+                <select class="form-select" id="va-sc-od"><option>20/20</option><option>20/25</option><option>20/30</option><option>20/40</option><option>20/50</option><option>20/60</option><option>20/80</option><option>20/100</option><option>20/200</option><option>CF</option><option>HM</option><option>LP</option><option>NLP</option></select>
+              </div>
+              <div class="form-group"><label class="form-label">VA Cc (with correction)</label>
+                <select class="form-select" id="va-cc-od"><option>20/20</option><option>20/25</option><option>20/30</option><option>20/40</option><option>20/50</option><option>20/60</option><option>20/80</option><option>20/100</option><option>20/200</option></select>
+              </div>
+            </div>
+            <div class="form-row cols-2">
+              <div class="form-group"><label class="form-label">Near VA</label><input class="form-input" id="near-va-od" placeholder="J1 / 20/20"/></div>
+              <div class="form-group"><label class="form-label">Pinhole</label><input class="form-input" id="ph-od" placeholder="20/20"/></div>
+            </div>
+          </div>
+          <div>
+            <div class="eye-label">OS — Left Eye</div>
+            <div class="form-row cols-2">
+              <div class="form-group"><label class="form-label">VA Sc</label>
+                <select class="form-select" id="va-sc-os"><option>20/20</option><option>20/25</option><option>20/30</option><option>20/40</option><option>20/50</option><option>20/60</option><option>20/80</option><option>20/100</option><option>20/200</option><option>CF</option><option>HM</option><option>LP</option><option>NLP</option></select>
+              </div>
+              <div class="form-group"><label class="form-label">VA Cc</label>
+                <select class="form-select" id="va-cc-os"><option>20/20</option><option>20/25</option><option>20/30</option><option>20/40</option><option>20/50</option><option>20/60</option><option>20/80</option><option>20/100</option><option>20/200</option></select>
+              </div>
+            </div>
+            <div class="form-row cols-2">
+              <div class="form-group"><label class="form-label">Near VA</label><input class="form-input" id="near-va-os" placeholder="J1 / 20/20"/></div>
+              <div class="form-group"><label class="form-label">Pinhole</label><input class="form-input" id="ph-os" placeholder="20/20"/></div>
+            </div>
+          </div>
+        </div>
+        <div class="form-group"><label class="form-label">Pupil Exam</label>
+          <div class="form-row cols-3">
+            <input class="form-input" id="pupil-size" placeholder="Size OD/OS (e.g. 4/4mm)"/>
+            <input class="form-input" id="pupil-reaction" placeholder="Reaction (brisk/sluggish)"/>
+            <input class="form-input" id="apd" placeholder="RAPD (none/OD/OS)"/>
+          </div>
+        </div>
+      </div>
+
+      <!-- Refraction Tab -->
+      <div id="exam-tab-refraction" style="display:none">
+        <div class="eye-section">
+          <div>
+            <div class="eye-label">OD</div>
+            <div class="form-row cols-3">
+              <div class="form-group"><label class="form-label">Sphere</label><input class="form-input" id="sph-od" placeholder="+0.00"/></div>
+              <div class="form-group"><label class="form-label">Cylinder</label><input class="form-input" id="cyl-od" placeholder="-0.00"/></div>
+              <div class="form-group"><label class="form-label">Axis</label><input class="form-input" id="axis-od" placeholder="180°"/></div>
+            </div>
+            <div class="form-row cols-2">
+              <div class="form-group"><label class="form-label">Add</label><input class="form-input" id="add-od" placeholder="+2.00"/></div>
+              <div class="form-group"><label class="form-label">Prism</label><input class="form-input" id="prism-od" placeholder="None"/></div>
+            </div>
+          </div>
+          <div>
+            <div class="eye-label">OS</div>
+            <div class="form-row cols-3">
+              <div class="form-group"><label class="form-label">Sphere</label><input class="form-input" id="sph-os" placeholder="+0.00"/></div>
+              <div class="form-group"><label class="form-label">Cylinder</label><input class="form-input" id="cyl-os" placeholder="-0.00"/></div>
+              <div class="form-group"><label class="form-label">Axis</label><input class="form-input" id="axis-os" placeholder="180°"/></div>
+            </div>
+            <div class="form-row cols-2">
+              <div class="form-group"><label class="form-label">Add</label><input class="form-input" id="add-os" placeholder="+2.00"/></div>
+              <div class="form-group"><label class="form-label">Prism</label><input class="form-input" id="prism-os" placeholder="None"/></div>
+            </div>
+          </div>
+        </div>
+        <div class="form-group"><label class="form-label">Best Corrected VA (BCVA)</label><input class="form-input" id="bcva" placeholder="e.g. OD 20/20, OS 20/25"/></div>
+      </div>
+
+      <!-- Slit Lamp Tab -->
+      <div id="exam-tab-slitlamp" style="display:none">
+        <div class="eye-section">
+          <div>
+            <div class="eye-label">OD</div>
+            <div class="form-group"><label class="form-label">Lids / Lashes / Lacrimal</label><input class="form-input" id="sl-lids-od" placeholder="Normal"/></div>
+            <div class="form-group"><label class="form-label">Conjunctiva / Sclera</label><input class="form-input" id="sl-conj-od" placeholder="Clear and white"/></div>
+            <div class="form-group"><label class="form-label">Cornea</label><input class="form-input" id="sl-cornea-od" placeholder="Clear, no staining"/></div>
+            <div class="form-group"><label class="form-label">Anterior Chamber</label><input class="form-input" id="sl-ac-od" placeholder="Deep, quiet"/></div>
+            <div class="form-group"><label class="form-label">Iris</label><input class="form-input" id="sl-iris-od" placeholder="Normal architecture"/></div>
+            <div class="form-group"><label class="form-label">Lens</label><input class="form-input" id="sl-lens-od" placeholder="Clear / NSC 1+ / IOL"/></div>
+            <div class="form-group"><label class="form-label">Vitreous</label><input class="form-input" id="sl-vit-od" placeholder="Clear"/></div>
+          </div>
+          <div>
+            <div class="eye-label">OS</div>
+            <div class="form-group"><label class="form-label">Lids / Lashes / Lacrimal</label><input class="form-input" id="sl-lids-os" placeholder="Normal"/></div>
+            <div class="form-group"><label class="form-label">Conjunctiva / Sclera</label><input class="form-input" id="sl-conj-os" placeholder="Clear and white"/></div>
+            <div class="form-group"><label class="form-label">Cornea</label><input class="form-input" id="sl-cornea-os" placeholder="Clear, no staining"/></div>
+            <div class="form-group"><label class="form-label">Anterior Chamber</label><input class="form-input" id="sl-ac-os" placeholder="Deep, quiet"/></div>
+            <div class="form-group"><label class="form-label">Iris</label><input class="form-input" id="sl-iris-os" placeholder="Normal architecture"/></div>
+            <div class="form-group"><label class="form-label">Lens</label><input class="form-input" id="sl-lens-os" placeholder="Clear / NSC 1+ / IOL"/></div>
+            <div class="form-group"><label class="form-label">Vitreous</label><input class="form-input" id="sl-vit-os" placeholder="Clear"/></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Fundus Tab -->
+      <div id="exam-tab-fundus" style="display:none">
+        <div class="eye-section">
+          <div>
+            <div class="eye-label">OD</div>
+            <div class="form-group"><label class="form-label">C/D Ratio</label><input class="form-input" id="cd-od" placeholder="0.3"/></div>
+            <div class="form-group"><label class="form-label">Disc Appearance</label><input class="form-input" id="disc-od" placeholder="Sharp margins, pink, healthy NRR"/></div>
+            <div class="form-group"><label class="form-label">Macula</label><input class="form-input" id="mac-od" placeholder="Flat, foveal reflex present"/></div>
+            <div class="form-group"><label class="form-label">Vessels</label><input class="form-input" id="vessels-od" placeholder="A/V ratio 2/3, no crossing changes"/></div>
+            <div class="form-group"><label class="form-label">Periphery</label><input class="form-input" id="periph-od" placeholder="Flat, no breaks or lattice"/></div>
+          </div>
+          <div>
+            <div class="eye-label">OS</div>
+            <div class="form-group"><label class="form-label">C/D Ratio</label><input class="form-input" id="cd-os" placeholder="0.3"/></div>
+            <div class="form-group"><label class="form-label">Disc Appearance</label><input class="form-input" id="disc-os" placeholder="Sharp margins, pink, healthy NRR"/></div>
+            <div class="form-group"><label class="form-label">Macula</label><input class="form-input" id="mac-os" placeholder="Flat, foveal reflex present"/></div>
+            <div class="form-group"><label class="form-label">Vessels</label><input class="form-input" id="vessels-os" placeholder="A/V ratio 2/3, no crossing changes"/></div>
+            <div class="form-group"><label class="form-label">Periphery</label><input class="form-input" id="periph-os" placeholder="Flat, no breaks or lattice"/></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- IOP Tab -->
+      <div id="exam-tab-iop" style="display:none">
+        <div class="eye-section">
+          <div>
+            <div class="eye-label">OD</div>
+            <div class="form-row cols-2">
+              <div class="form-group"><label class="form-label">IOP (mmHg)</label><input class="form-input" id="iop-od" placeholder="14"/></div>
+              <div class="form-group"><label class="form-label">Method</label>
+                <select class="form-select" id="iop-method-od"><option>Goldmann</option><option>iCare</option><option>Non-contact</option><option>Tonopen</option></select>
+              </div>
+            </div>
+            <div class="form-row cols-2">
+              <div class="form-group"><label class="form-label">CCT (µm)</label><input class="form-input" id="cct-od" placeholder="550"/></div>
+              <div class="form-group"><label class="form-label">Gonioscopy</label>
+                <select class="form-select" id="gonio-od"><option>Not done</option><option>Open (Shaffer 3-4)</option><option>Narrow (Shaffer 1-2)</option><option>Closed</option></select>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="eye-label">OS</div>
+            <div class="form-row cols-2">
+              <div class="form-group"><label class="form-label">IOP (mmHg)</label><input class="form-input" id="iop-os" placeholder="14"/></div>
+              <div class="form-group"><label class="form-label">Method</label>
+                <select class="form-select" id="iop-method-os"><option>Goldmann</option><option>iCare</option><option>Non-contact</option><option>Tonopen</option></select>
+              </div>
+            </div>
+            <div class="form-row cols-2">
+              <div class="form-group"><label class="form-label">CCT (µm)</label><input class="form-input" id="cct-os" placeholder="550"/></div>
+              <div class="form-group"><label class="form-label">Gonioscopy</label>
+                <select class="form-select" id="gonio-os"><option>Not done</option><option>Open (Shaffer 3-4)</option><option>Narrow (Shaffer 1-2)</option><option>Closed</option></select>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="form-group" style="margin-top:4px">
+          <label class="form-label">Color Vision</label>
+          <div class="form-row cols-2">
+            <input class="form-input" id="cv-od" placeholder="OD: Normal / Deficient"/>
+            <input class="form-input" id="cv-os" placeholder="OS: Normal / Deficient"/>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Confrontation Visual Fields</label>
+          <div class="form-row cols-2">
+            <input class="form-input" id="cvf-od" placeholder="OD: Full to confrontation"/>
+            <input class="form-input" id="cvf-os" placeholder="OS: Full to confrontation"/>
+          </div>
+        </div>
+      </div>
+
+      <!-- A/P Tab -->
+      <div id="exam-tab-plan" style="display:none">
+        <div class="form-group"><label class="form-label">Assessment / Diagnosis (ICD-10)</label><textarea class="form-textarea" id="exam-assessment" placeholder="H40.11X0 — Primary open-angle glaucoma, mild stage, right eye…"></textarea></div>
+        <div class="form-group"><label class="form-label">Plan</label><textarea class="form-textarea" id="exam-plan" placeholder="1. Start Latanoprost 0.005% QHS OD&#10;2. Schedule HVF 24-2 in 4 weeks&#10;3. OCT nerve fiber layer in 3 months&#10;4. Return in 6 weeks for IOP recheck"></textarea></div>
+        <div class="form-row cols-2">
+          <div class="form-group"><label class="form-label">Follow-up</label><input class="form-input" id="exam-followup" placeholder="6 weeks / 3 months / PRN"/></div>
+          <div class="form-group"><label class="form-label">Referral</label><input class="form-input" id="exam-referral" placeholder="None / Retina / Neuro-ophtho…"/></div>
+        </div>
+        <div class="form-group"><label class="form-label">Provider Notes</label><textarea class="form-textarea" id="exam-notes" placeholder="Additional notes…" style="min-height:60px"></textarea></div>
+      </div>
+
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-exam')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveExam()">Save Examination</button>
+    </div>
+  </div>
+</div>
+
+<!-- Rx Modal -->
+<div class="modal-overlay" id="modal-rx" style="display:none" onclick="closeModal('modal-rx', event)">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">New Prescription</div>
+      <button class="close-btn" onclick="closeModal('modal-rx')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row cols-2">
+        <div class="form-group"><label class="form-label">Patient</label>
+          <select class="form-select" id="rx-patient"><option>-- Select --</option></select>
+        </div>
+        <div class="form-group"><label class="form-label">Rx Type</label>
+          <select class="form-select" id="rx-type" onchange="toggleRxFields()">
+            <option>Spectacle</option><option>Contact Lens</option><option>Medication</option>
+          </select>
+        </div>
+      </div>
+      <div id="rx-optics">
+        <div class="eye-section">
+          <div>
+            <div class="eye-label">OD</div>
+            <div class="form-row cols-3">
+              <div class="form-group"><label class="form-label">Sphere</label><input class="form-input" id="rx-sph-od" placeholder="-1.00"/></div>
+              <div class="form-group"><label class="form-label">Cylinder</label><input class="form-input" id="rx-cyl-od" placeholder="-0.50"/></div>
+              <div class="form-group"><label class="form-label">Axis</label><input class="form-input" id="rx-axis-od" placeholder="090"/></div>
+            </div>
+            <div class="form-group"><label class="form-label">Add</label><input class="form-input" id="rx-add-od" placeholder="+2.25"/></div>
+          </div>
+          <div>
+            <div class="eye-label">OS</div>
+            <div class="form-row cols-3">
+              <div class="form-group"><label class="form-label">Sphere</label><input class="form-input" id="rx-sph-os" placeholder="-0.75"/></div>
+              <div class="form-group"><label class="form-label">Cylinder</label><input class="form-input" id="rx-cyl-os" placeholder="-0.25"/></div>
+              <div class="form-group"><label class="form-label">Axis</label><input class="form-input" id="rx-axis-os" placeholder="180"/></div>
+            </div>
+            <div class="form-group"><label class="form-label">Add</label><input class="form-input" id="rx-add-os" placeholder="+2.25"/></div>
+          </div>
+        </div>
+      </div>
+      <div id="rx-medication" style="display:none">
+        <div class="form-group"><label class="form-label">Medication</label><input class="form-input" id="rx-med-name" placeholder="e.g. Latanoprost 0.005% Ophthalmic Solution"/></div>
+        <div class="form-row cols-3">
+          <div class="form-group"><label class="form-label">Dose / Sig</label><input class="form-input" id="rx-sig" placeholder="1 drop QHS"/></div>
+          <div class="form-group"><label class="form-label">Eye(s)</label>
+            <select class="form-select" id="rx-eye"><option>OD</option><option>OS</option><option>OU</option></select>
+          </div>
+          <div class="form-group"><label class="form-label">Quantity</label><input class="form-input" id="rx-qty" placeholder="2.5 mL / 30 tabs"/></div>
+        </div>
+        <div class="form-row cols-2">
+          <div class="form-group"><label class="form-label">Refills</label><input class="form-input" id="rx-refills" placeholder="3"/></div>
+          <div class="form-group"><label class="form-label">Indication</label><input class="form-input" id="rx-indication" placeholder="Glaucoma / Dry eye / Infection"/></div>
+        </div>
+      </div>
+      <div class="form-group"><label class="form-label">Notes</label><textarea class="form-textarea" id="rx-notes" placeholder="Special instructions…" style="min-height:60px"></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-rx')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveRx()">Issue Prescription</button>
+    </div>
+  </div>
+</div>
+
+<!-- Surgical Modal -->
+<div class="modal-overlay" id="modal-surgical" style="display:none" onclick="closeModal('modal-surgical', event)">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Log Surgical Procedure</div>
+      <button class="close-btn" onclick="closeModal('modal-surgical')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row cols-2">
+        <div class="form-group"><label class="form-label">Patient</label>
+          <select class="form-select" id="surg-patient"><option>-- Select --</option></select>
+        </div>
+        <div class="form-group"><label class="form-label">Date</label><input class="form-input" id="surg-date" type="date"/></div>
+      </div>
+      <div class="form-row cols-2">
+        <div class="form-group"><label class="form-label">Procedure</label>
+          <select class="form-select" id="surg-proc">
+            <option>Phacoemulsification + IOL (Cataract)</option>
+            <option>Trabeculectomy</option>
+            <option>Tube Shunt (Ahmed/Baerveldt)</option>
+            <option>LASIK</option><option>PRK</option>
+            <option>Vitrectomy (PPV)</option>
+            <option>Scleral Buckle</option>
+            <option>Intravitreal Injection (Anti-VEGF)</option>
+            <option>YAG Capsulotomy</option>
+            <option>SLT (Laser Trabeculoplasty)</option>
+            <option>LPI (Laser Peripheral Iridotomy)</option>
+            <option>Pterygium Excision</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="form-group"><label class="form-label">Eye</label>
+          <select class="form-select" id="surg-eye"><option>OD</option><option>OS</option><option>OU</option></select>
+        </div>
+      </div>
+      <div class="form-row cols-2">
+        <div class="form-group"><label class="form-label">Anesthesia</label>
+          <select class="form-select" id="surg-anesthesia"><option>Topical</option><option>Peribulbar</option><option>Retrobulbar</option><option>General</option></select>
+        </div>
+        <div class="form-group"><label class="form-label">Outcome</label>
+          <select class="form-select" id="surg-outcome"><option>✓ Uncomplicated</option><option>⚠ Minor Complication</option><option>⚠ Complication — see notes</option></select>
+        </div>
+      </div>
+      <div class="form-group"><label class="form-label">Operative Notes</label><textarea class="form-textarea" id="surg-notes" placeholder="Procedure details, IOL power, complications, post-op plan…"></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-surgical')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveSurgical()">Save Record</button>
+    </div>
+  </div>
+</div>
+
+<!-- Encounter Modal -->
+<div class="modal-overlay" id="modal-encounter" style="display:none" onclick="closeModal('modal-encounter', event)">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">New Clinical Encounter</div>
+      <button class="close-btn" onclick="closeModal('modal-encounter')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row cols-2">
+        <div class="form-group"><label class="form-label">Patient</label>
+          <select class="form-select" id="enc-patient"><option>-- Select --</option></select>
+        </div>
+        <div class="form-group"><label class="form-label">Encounter Type</label>
+          <select class="form-select" id="enc-type">
+            <option>New Patient (Comprehensive)</option><option>Established Patient (Comprehensive)</option>
+            <option>Follow-up</option><option>Urgent / Acute Visit</option>
+            <option>Post-operative</option><option>Telemedicine</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row cols-2">
+        <div class="form-group"><label class="form-label">Date & Time</label><input class="form-input" id="enc-date" type="datetime-local"/></div>
+        <div class="form-group"><label class="form-label">Provider</label><input class="form-input" id="enc-provider" value="Dr. Cyrille Cabrera"/></div>
+      </div>
+      <div class="form-group"><label class="form-label">Chief Complaint</label><textarea class="form-textarea" id="enc-cc" placeholder="Blurry vision, eye pain, floaters…" style="min-height:60px"></textarea></div>
+      <div class="form-group"><label class="form-label">ICD-10 Diagnosis</label><input class="form-input" id="enc-icd" placeholder="H40.11X0, H26.9, H35.30…"/></div>
+      <div class="form-group"><label class="form-label">CPT Code(s)</label><input class="form-input" id="enc-cpt" placeholder="92004, 92014, 92134…"/></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-encounter')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveEncounter()">Save Encounter</button>
+    </div>
+  </div>
+</div>
+
+<!-- Book Appointment Modal -->
+<div class="modal-overlay" id="modal-book" style="display:none" onclick="closeModal('modal-book', event)">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Book Appointment</div>
+      <button class="close-btn" onclick="closeModal('modal-book')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row cols-2">
+        <div class="form-group"><label class="form-label">Patient</label>
+          <select class="form-select" id="book-patient"><option>-- Select --</option></select>
+        </div>
+        <div class="form-group"><label class="form-label">Date</label><input class="form-input" id="book-date" type="date"/></div>
+      </div>
+      <div class="form-row cols-2">
+        <div class="form-group"><label class="form-label">Time</label>
+          <select class="form-select" id="book-time">
+            <option>08:00</option><option>08:30</option><option>09:00</option><option>09:30</option>
+            <option>10:00</option><option>10:30</option><option>11:00</option><option>11:30</option>
+            <option>13:00</option><option>13:30</option><option>14:00</option><option>14:30</option>
+            <option>15:00</option><option>15:30</option><option>16:00</option><option>16:30</option>
+          </select>
+        </div>
+        <div class="form-group"><label class="form-label">Visit Type</label>
+          <select class="form-select" id="book-type">
+            <option>Comprehensive Exam</option><option>Follow-up</option><option>New Patient</option>
+            <option>Glaucoma Follow-up</option><option>Diabetic Eye Exam</option>
+            <option>Post-operative</option><option>Contact Lens Fit</option>
+            <option>LASIK Consult</option><option>Injection</option><option>Urgent</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group"><label class="form-label">Notes</label><textarea class="form-textarea" id="book-notes" placeholder="Patient notes, special instructions…" style="min-height:60px"></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-book')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveAppointment()">Book Appointment</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===================== DATA STORE =====================
+const store = {
+  patients: [],
+  encounters: [],
+  exams: [],
+  prescriptions: [],
+  surgical: [],
+};
+
+// ===================== NAVIGATION =====================
+function showPage(id, el) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  if (el) el.classList.add('active');
+  const titles = { dashboard:'Dashboard', patients:'Patients', appointments:'Schedule',
+    encounters:'Encounters', exams:'Eye Exams', imaging:'Imaging & Diagnostics',
+    prescriptions:'Prescriptions', surgical:'Surgical Log', billing:'Billing', reports:'Reports' };
+  document.getElementById('topbar-title').textContent = titles[id] || id;
+  if (id === 'dashboard') renderDashboard();
+  if (id === 'patients') renderPatients();
+  if (id === 'encounters') renderEncounters();
+  if (id === 'exams') renderExams();
+  if (id === 'prescriptions') renderPrescriptions();
+  if (id === 'surgical') renderSurgical();
+  if (id === 'appointments') renderCalendar();
+  if (id === 'reports') renderReports();
+}
+
+// ===================== PATIENTS =====================
+let patientFilter = 'all';
+
+function renderPatients(filter) {
+  if (filter) patientFilter = filter;
+  const list = patientFilter === 'all' ? store.patients
+    : store.patients.filter(p => p.tags.includes(patientFilter));
+  const tb = document.getElementById('patient-table-body');
+  const age = dob => {
+    const d = new Date(dob); const now = new Date();
+    return now.getFullYear() - d.getFullYear() - (now < new Date(now.getFullYear(), d.getMonth(), d.getDate()) ? 1 : 0);
+  };
+  tb.innerHTML = list.map(p => `
+    <tr onclick="viewPatientById(${p.id})">
+      <td><strong>${p.fname} ${p.lname}</strong></td>
+      <td>${p.dob} <span style="color:var(--text3)">(${age(p.dob)} yr)</span></td>
+      <td style="font-family:'DM Mono',monospace;font-size:12.5px">${p.mrn}</td>
+      <td>${p.dx}</td>
+      <td style="color:var(--text3)">${p.lastVisit}</td>
+      <td><span class="badge badge-blue">${p.nextAppt}</span></td>
+      <td><button class="btn btn-secondary" style="padding:0 10px;height:28px;font-size:12px" onclick="event.stopPropagation();showExamModal(${p.id})">+ Exam</button></td>
+    </tr>`).join('');
+}
+
+function filterPatients(f) {
+  patientFilter = f;
+  document.querySelectorAll('[id^="filter-"]').forEach(b => {
+    b.style.background = ''; b.style.color = ''; b.style.borderColor = '';
+  });
+  const el = document.getElementById('filter-' + f);
+  if (el) { el.style.background = 'var(--accent)'; el.style.color = '#fff'; el.style.borderColor = 'var(--accent)'; }
+  renderPatients();
+}
+
+function viewPatient(name) {
+  const p = store.patients.find(x => x.fname + ' ' + x.lname === name);
+  if (p) viewPatientById(p.id);
+}
+
+function viewPatientById(id) {
+  const p = store.patients.find(x => x.id === id);
+  if (!p) return;
+  alert(`📋 Patient Chart\n\n${p.fname} ${p.lname}\nMRN: ${p.mrn}\nDOB: ${p.dob}\nInsurance: ${p.insurance}\nPrimary Dx: ${p.dx}\n\nOpening chart… (Full chart view coming soon)`);
+}
+
+function showNewPatientModal() {
+  document.getElementById('modal-patient').style.display = 'flex';
+}
+
+function quickNewPatient() {
+  showPage('patients', document.querySelector('.nav-item:nth-child(2)'));
+  setTimeout(showNewPatientModal, 100);
+}
+
+function savePatient() {
+  const fname = document.getElementById('pt-fname').value.trim();
+  const lname = document.getElementById('pt-lname').value.trim();
+  const dob = document.getElementById('pt-dob').value;
+  if (!fname || !lname || !dob) { alert('Please fill in First Name, Last Name, and Date of Birth.'); return; }
+  const mrn = 'MRN-' + String(store.patients.length + 1).padStart(3, '0');
+  store.patients.push({
+    id: store.patients.length + 1,
+    fname, lname, dob, mrn,
+    dx: document.getElementById('pt-cc').value || 'New Patient',
+    lastVisit: '—', nextAppt: '—',
+    gender: document.getElementById('pt-gender').value,
+    phone: document.getElementById('pt-phone').value,
+    insurance: document.getElementById('pt-ins-name').value || 'Unknown',
+    tags: []
+  });
+  closeModal('modal-patient');
+  renderPatients();
+  refreshPatientDropdowns();
+  alert(`✅ Patient registered!\n${fname} ${lname} — ${mrn}`);
+}
+
+// ===================== ENCOUNTERS =====================
+function renderEncounters() {
+  const tb = document.getElementById('encounter-table-body');
+  tb.innerHTML = store.encounters.map(e => `
+    <tr>
+      <td style="font-family:'DM Mono',monospace;font-size:12.5px">${e.date}</td>
+      <td><strong>${e.patient}</strong></td>
+      <td>${e.type}</td>
+      <td>${e.provider}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:12.5px">${e.icd}</td>
+      <td><span class="badge badge-green">${e.status}</span></td>
+      <td><button class="btn btn-ghost" style="padding:0 8px;height:28px;font-size:12px">View</button></td>
+    </tr>`).join('');
+}
+
+function showNewEncounterModal() {
+  refreshPatientDropdowns();
+  const now = new Date();
+  document.getElementById('enc-date').value = now.toISOString().slice(0,16);
+  document.getElementById('modal-encounter').style.display = 'flex';
+}
+
+function saveEncounter() {
+  const pat = document.getElementById('enc-patient').value;
+  if (!pat || pat === '-- Select --') { alert('Please select a patient.'); return; }
+  store.encounters.unshift({
+    id: store.encounters.length + 1,
+    date: new Date().toLocaleDateString('en-US', {month:'2-digit',day:'2-digit',year:'numeric'}),
+    patient: pat, type: document.getElementById('enc-type').value,
+    provider: document.getElementById('enc-provider').value,
+    icd: document.getElementById('enc-icd').value || 'Z01.00',
+    status: 'Draft'
+  });
+  closeModal('modal-encounter');
+  renderEncounters();
+}
+
+// ===================== EXAMS =====================
+function renderExams() {
+  const el = document.getElementById('exam-list');
+  if (!store.exams.length) {
+    el.innerHTML = '<div class="empty-state"><div class="empty-icon">🔬</div><p>No examinations recorded yet.<br>Click "+ New Exam" to add one.</p></div>';
+    return;
+  }
+  el.innerHTML = store.exams.map(e => `
+    <div class="card" style="margin-bottom:12px">
+      <div class="card-header">
+        <span style="font-size:15px">🔬</span>
+        <div>
+          <div class="card-title">${e.patient}</div>
+          <div style="font-size:11.5px;color:var(--text3)">${e.date}</div>
+        </div>
+        <div style="margin-left:auto;display:flex;gap:20px;font-size:13px">
+          <span><strong>IOP OD</strong> <span style="font-family:'DM Mono',monospace;color:${e.iopOD > 21 ? 'var(--red)' : 'var(--green)'}">${e.iopOD} mmHg</span></span>
+          <span><strong>IOP OS</strong> <span style="font-family:'DM Mono',monospace;color:${e.iopOS > 21 ? 'var(--red)' : 'var(--green)'}">${e.iopOS} mmHg</span></span>
+          <span><strong>VA OD</strong> <span style="font-family:'DM Mono',monospace">${e.vaOD}</span></span>
+          <span><strong>VA OS</strong> <span style="font-family:'DM Mono',monospace">${e.vaOS}</span></span>
+        </div>
+      </div>
+      <div class="card-body" style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div><div class="section-title">Assessment</div><p style="font-size:13px;color:var(--text2)">${e.dx}</p></div>
+        <div><div class="section-title">Plan</div><p style="font-size:13px;color:var(--text2)">${e.plan}</p></div>
+      </div>
+    </div>`).join('');
+}
+
+function showExamModal(patId) {
+  refreshPatientDropdowns();
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('exam-date').value = today;
+  if (patId) {
+    const p = store.patients.find(x => x.id === patId);
+    if (p) document.getElementById('exam-patient').value = p.fname + ' ' + p.lname;
+  }
+  document.getElementById('modal-exam').style.display = 'flex';
+}
+
+function saveExam() {
+  const pat = document.getElementById('exam-patient').value;
+  if (!pat || pat === '-- Select Patient --') { alert('Please select a patient.'); return; }
+  store.exams.unshift({
+    id: store.exams.length + 1,
+    date: document.getElementById('exam-date').value || new Date().toLocaleDateString(),
+    patient: pat,
+    vaOD: document.getElementById('va-cc-od').value || '20/20',
+    vaOS: document.getElementById('va-cc-os').value || '20/20',
+    iopOD: parseInt(document.getElementById('iop-od').value) || 14,
+    iopOS: parseInt(document.getElementById('iop-os').value) || 14,
+    dx: document.getElementById('exam-assessment').value || 'See notes',
+    plan: document.getElementById('exam-plan').value || 'See notes'
+  });
+  closeModal('modal-exam');
+  renderExams();
+  alert('✅ Examination saved successfully.');
+}
+
+// ===================== PRESCRIPTIONS =====================
+function renderPrescriptions() {
+  const el = document.getElementById('rx-list');
+  el.innerHTML = store.prescriptions.map(rx => `
+    <div class="card" style="margin-bottom:10px">
+      <div class="card-body" style="display:flex;align-items:center;gap:16px">
+        <div style="font-size:24px">${rx.type === 'Medication' ? '💊' : rx.type === 'Contact Lens' ? '👁' : '👓'}</div>
+        <div style="flex:1">
+          <div style="font-weight:600;font-size:14px">${rx.patient}</div>
+          <div style="font-family:'DM Mono',monospace;font-size:12.5px;color:var(--text2);margin-top:3px">${rx.rx}</div>
+        </div>
+        <div style="text-align:right">
+          <span class="badge badge-${rx.type === 'Medication' ? 'amber' : 'blue'}">${rx.type}</span>
+          <div style="font-size:11.5px;color:var(--text3);margin-top:4px">${rx.date} · ${rx.refills} refills</div>
+        </div>
+        <button class="btn btn-secondary" style="padding:0 10px;height:28px;font-size:12px">Print</button>
+      </div>
+    </div>`).join('');
+}
+
+function showRxModal() {
+  refreshPatientDropdowns();
+  document.getElementById('modal-rx').style.display = 'flex';
+}
+
+function toggleRxFields() {
+  const type = document.getElementById('rx-type').value;
+  document.getElementById('rx-optics').style.display = type === 'Medication' ? 'none' : 'block';
+  document.getElementById('rx-medication').style.display = type === 'Medication' ? 'block' : 'none';
+}
+
+function saveRx() {
+  const pat = document.getElementById('rx-patient').value;
+  const type = document.getElementById('rx-type').value;
+  if (!pat || pat === '-- Select --') { alert('Please select a patient.'); return; }
+  let rxStr = '';
+  if (type === 'Medication') {
+    rxStr = `${document.getElementById('rx-med-name').value} — ${document.getElementById('rx-sig').value} ${document.getElementById('rx-eye').value}`;
+  } else {
+    rxStr = `OD: ${document.getElementById('rx-sph-od').value||'plano'} ${document.getElementById('rx-cyl-od').value||''} x ${document.getElementById('rx-axis-od').value||''}, OS: ${document.getElementById('rx-sph-os').value||'plano'} ${document.getElementById('rx-cyl-os').value||''} x ${document.getElementById('rx-axis-os').value||''}`;
+  }
+  store.prescriptions.unshift({
+    id: store.prescriptions.length + 1,
+    date: new Date().toLocaleDateString('en-US', {month:'2-digit',day:'2-digit',year:'numeric'}),
+    patient: pat, type, rx: rxStr,
+    refills: parseInt(document.getElementById('rx-refills')?.value) || 0
+  });
+  closeModal('modal-rx');
+  renderPrescriptions();
+}
+
+// ===================== SURGICAL =====================
+function renderSurgical() {
+  const tb = document.getElementById('surgical-table-body');
+  tb.innerHTML = store.surgical.map(s => `
+    <tr>
+      <td style="font-family:'DM Mono',monospace;font-size:12.5px">${s.date}</td>
+      <td><strong>${s.patient}</strong></td>
+      <td>${s.procedure}</td>
+      <td><span class="badge badge-${s.eye === 'OU' ? 'blue' : 'gray'}">${s.eye}</span></td>
+      <td>${s.surgeon}</td>
+      <td><span class="badge badge-${s.outcome.includes('✓') ? 'green' : 'amber'}">${s.outcome}</span></td>
+      <td style="font-size:12px;color:var(--text3);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${s.notes}</td>
+    </tr>`).join('');
+}
+
+function showSurgicalModal() {
+  refreshPatientDropdowns();
+  document.getElementById('surg-date').value = new Date().toISOString().split('T')[0];
+  document.getElementById('modal-surgical').style.display = 'flex';
+}
+
+function saveSurgical() {
+  const pat = document.getElementById('surg-patient').value;
+  if (!pat || pat === '-- Select --') { alert('Please select a patient.'); return; }
+  store.surgical.unshift({
+    date: document.getElementById('surg-date').value,
+    patient: pat,
+    procedure: document.getElementById('surg-proc').value,
+    eye: document.getElementById('surg-eye').value,
+    surgeon: 'Dr. Cyrille Cabrera',
+    outcome: document.getElementById('surg-outcome').value,
+    notes: document.getElementById('surg-notes').value
+  });
+  closeModal('modal-surgical');
+  renderSurgical();
+}
+
+// ===================== CALENDAR =====================
+let weekOffset = 0;
+function changeWeek(d) { weekOffset += d; renderCalendar(); }
+
+function renderCalendar() {
+  const base = new Date('2026-04-07');
+  base.setDate(base.getDate() + weekOffset * 7);
+  const days = Array.from({length:5}, (_,i) => {
+    const d = new Date(base); d.setDate(base.getDate() + i);
+    return d;
+  });
+  document.getElementById('week-label').textContent =
+    'Week of ' + days[0].toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
+
+  const times = ['08:00','08:30','09:00','09:30','10:00','10:30','11:00','11:30',
+                 '13:00','13:30','14:00','14:30','15:00','15:30','16:00','16:30'];
+
+  const sched = {
+    '2026-04-07 09:00': { pt:'E. Voss', type:'Follow-up', color:'var(--green-light)', bc:'var(--green)' },
+    '2026-04-07 10:00': { pt:'M. Chen', type:'Glaucoma', color:'var(--amber-light)', bc:'var(--amber)' },
+    '2026-04-08 09:00': { pt:'T. Nakamura', type:'LASIK Consult', color:'var(--accent-light)', bc:'var(--accent)' },
+    '2026-04-09 11:00': { pt:'S. Reyes', type:'Diabetic Exam', color:'var(--accent-light)', bc:'var(--accent)' },
+    '2026-04-10 13:00': { pt:'P. Okonkwo', type:'Post-op', color:'var(--green-light)', bc:'var(--green)' },
+    '2026-04-11 09:30': { pt:'R. Flemming', type:'Anti-VEGF', color:'var(--amber-light)', bc:'var(--amber)' },
+  };
+
+  const grid = document.getElementById('week-calendar');
+  grid.innerHTML = `
+    <table style="width:100%;border-collapse:collapse">
+      <thead>
+        <tr>
+          <th style="padding:10px 12px;font-size:11px;color:var(--text3);width:60px;border-bottom:1px solid var(--border)">Time</th>
+          ${days.map(d => `<th style="padding:10px 12px;font-size:12px;font-weight:600;color:var(--text);border-bottom:1px solid var(--border);border-left:1px solid var(--border)">${d.toLocaleDateString('en-US',{weekday:'short'})} <span style="color:var(--text3);font-weight:400">${d.getDate()}</span></th>`).join('')}
+        </tr>
+      </thead>
+      <tbody>
+        ${times.map(t => `
+          <tr>
+            <td style="padding:6px 12px;font-family:'DM Mono',monospace;font-size:11px;color:var(--text3);border-bottom:1px solid var(--border);white-space:nowrap">${t}</td>
+            ${days.map(d => {
+              const key = d.toISOString().split('T')[0] + ' ' + t;
+              const appt = sched[key];
+              return `<td style="border-left:1px solid var(--border);border-bottom:1px solid var(--border);padding:4px 6px;height:36px;cursor:pointer" onclick="showBookModal()" title="${appt ? appt.pt + ' — ' + appt.type : 'Click to book'}">
+                ${appt ? `<div style="background:${appt.color};border-left:3px solid ${appt.bc};border-radius:4px;padding:3px 6px;font-size:11.5px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${appt.pt}<div style="font-size:10.5px;font-weight:400;color:var(--text3)">${appt.type}</div></div>` : ''}
+              </td>`;
+            }).join('')}
+          </tr>`).join('')}
+      </tbody>
+    </table>`;
+}
+
+function showBookModal() {
+  refreshPatientDropdowns();
+  document.getElementById('book-date').value = new Date().toISOString().split('T')[0];
+  document.getElementById('modal-book').style.display = 'flex';
+}
+
+function saveAppointment() {
+  const pat = document.getElementById('book-patient').value;
+  if (!pat || pat === '-- Select --') { alert('Please select a patient.'); return; }
+  closeModal('modal-book');
+  alert(`✅ Appointment booked!\n${pat} — ${document.getElementById('book-date').value} at ${document.getElementById('book-time').value}`);
+}
+
+// ===================== REPORTS =====================
+function renderReports() {
+  // Bar chart
+  const months = ['Oct','Nov','Dec','Jan','Feb','Mar','Apr'];
+  const vals = [78, 82, 65, 90, 87, 95, 42];
+  const maxV = Math.max(...vals);
+  const bc = document.getElementById('visit-bar-chart');
+  bc.innerHTML = vals.map((v,i) => `
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px">
+      <div style="font-size:11px;font-family:'DM Mono',monospace;color:var(--text3)">${v}</div>
+      <div style="width:100%;background:${i===6?'var(--accent)':'var(--accent-light)'};border-radius:4px 4px 0 0;height:${Math.round(v/maxV*100)}px;min-height:4px;transition:height 0.3s"></div>
+    </div>`).join('');
+  document.getElementById('bar-labels').innerHTML = months.map(m => `<div style="flex:1;text-align:center">${m}</div>`).join('');
+
+  // Dx breakdown
+  const dxes = [
+    { label:'Glaucoma', pct:22, color:'var(--accent)' },
+    { label:'Cataract', pct:18, color:'#7c3aed' },
+    { label:'AMD', pct:15, color:'var(--amber)' },
+    { label:'Diabetic Retinopathy', pct:12, color:'var(--red)' },
+    { label:'Refractive Error', pct:20, color:'var(--green)' },
+    { label:'Other', pct:13, color:'var(--text3)' },
+  ];
+  document.getElementById('dx-breakdown').innerHTML = dxes.map(d => `
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+      <div style="width:10px;height:10px;border-radius:2px;background:${d.color};flex-shrink:0"></div>
+      <div style="flex:1;font-size:13px">${d.label}</div>
+      <div style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text2);min-width:32px;text-align:right">${d.pct}%</div>
+      <div style="width:80px;height:6px;background:var(--surface2);border-radius:3px">
+        <div style="width:${d.pct*4}px;height:6px;background:${d.color};border-radius:3px"></div>
+      </div>
+    </div>`).join('');
+
+  // Demographics
+  const ageBands = [['< 18', 3], ['18–40', 12], ['41–60', 28], ['61–75', 34], ['76+', 23]];
+  document.getElementById('age-demo').innerHTML = ageBands.map(([l,v]) => `
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;font-size:13px">
+      <div style="min-width:50px;color:var(--text2)">${l}</div>
+      <div style="flex:1;height:6px;background:var(--surface2);border-radius:3px"><div style="width:${v/34*100}%;height:6px;background:var(--accent);border-radius:3px"></div></div>
+      <div style="min-width:28px;text-align:right;font-family:'DM Mono',monospace;font-size:11.5px;color:var(--text3)">${v}%</div>
+    </div>`).join('');
+
+  const ins = [['Medicare', 38], ['Blue Cross', 22], ['Aetna', 15], ['United', 11], ['Medicaid', 9], ['Other', 5]];
+  document.getElementById('ins-demo').innerHTML = ins.map(([l,v]) => `
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;font-size:13px">
+      <div style="min-width:70px;color:var(--text2);white-space:nowrap">${l}</div>
+      <div style="flex:1;height:6px;background:var(--surface2);border-radius:3px"><div style="width:${v/38*100}%;height:6px;background:var(--green);border-radius:3px"></div></div>
+      <div style="min-width:28px;text-align:right;font-family:'DM Mono',monospace;font-size:11.5px;color:var(--text3)">${v}%</div>
+    </div>`).join('');
+
+  document.getElementById('top-dx').innerHTML = ['H40.11 — POAG', 'H26.9 — Cataract', 'H35.3 — AMD', 'E11.39 — Diabetic Retino.', 'H52.1 — Myopia', 'H52.4 — Presbyopia']
+    .map((d,i) => `<div style="padding:6px 0;font-size:12.5px;border-bottom:1px solid var(--border);color:var(--text2);display:flex;align-items:center;gap:6px"><span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--text3)">${i+1}.</span>${d}</div>`).join('');
+}
+
+// ===================== HELPERS =====================
+function refreshPatientDropdowns() {
+  const names = store.patients.map(p => `<option>${p.fname} ${p.lname}</option>`).join('');
+  ['exam-patient','rx-patient','surg-patient','enc-patient','book-patient'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      const first = el.options[0]?.text || '-- Select --';
+      el.innerHTML = `<option>${first}</option>` + names;
+    }
+  });
+}
+
+function switchTab(groupId, targetId, clickedEl) {
+  // find all sibling tab divs
+  const group = document.getElementById(groupId);
+  group.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  clickedEl.classList.add('active');
+  // get parent modal-body
+  const body = group.closest('.modal-body') || group.parentElement;
+  // find all tab content divs that match IDs starting with the prefix
+  const prefix = targetId.replace(/-[^-]+$/, '-');
+  body.querySelectorAll('[id^="' + prefix + '"]').forEach(el => el.style.display = 'none');
+  const target = document.getElementById(targetId);
+  if (target) target.style.display = '';
+}
+
+function closeModal(id, event) {
+  if (event && event.target !== document.getElementById(id)) return;
+  document.getElementById(id).style.display = 'none';
+}
+
+function globalSearch(val) {
+  if (val.length < 2) return;
+  const matches = store.patients.filter(p =>
+    (p.fname + ' ' + p.lname).toLowerCase().includes(val.toLowerCase()) ||
+    p.mrn.toLowerCase().includes(val.toLowerCase())
+  );
+  if (matches.length > 0) {
+    showPage('patients', document.querySelectorAll('.nav-item')[1]);
+    renderPatients();
+  }
+}
+
+// ===================== DASHBOARD =====================
+function renderDashboard() {
+  // Stats
+  document.getElementById('stat-patients').textContent = store.patients.length;
+  document.getElementById('stat-patients-sub').textContent = store.patients.length === 0 ? 'No patients yet' : store.patients.length + ' registered';
+  document.getElementById('stat-encounters').textContent = store.encounters.length;
+  document.getElementById('stat-encounters-sub').textContent = store.encounters.length === 0 ? 'No encounters yet' : store.encounters.length + ' total';
+  document.getElementById('stat-rx').textContent = store.prescriptions.length;
+  document.getElementById('stat-rx-sub').textContent = store.prescriptions.length === 0 ? 'No prescriptions yet' : store.prescriptions.length + ' issued';
+  document.getElementById('stat-appts').textContent = store.encounters.length;
+  document.getElementById('stat-appts-sub').textContent = 'Based on encounters';
+
+  // Today's schedule — show most recent encounters
+  const tbody = document.getElementById('today-schedule');
+  const empty = document.getElementById('today-schedule-empty');
+  if (store.encounters.length === 0) {
+    tbody.innerHTML = '';
+    if (empty) empty.style.display = '';
+  } else {
+    if (empty) empty.style.display = 'none';
+    tbody.innerHTML = store.encounters.slice(0, 8).map(e => `
+      <tr>
+        <td style="font-family:'DM Mono',monospace;font-size:12.5px;color:var(--text2)">${e.date}</td>
+        <td><strong>${e.patient}</strong></td>
+        <td>${e.type}</td>
+        <td><span class="badge badge-green">${e.status}</span></td>
+      </tr>`).join('');
+  }
+
+  // Alerts — flag high IOP from exams
+  const alertsList = document.getElementById('alerts-list');
+  const alertsEmpty = document.getElementById('alerts-empty');
+  const alerts = store.exams.filter(e => e.iopOD > 21 || e.iopOS > 21).map(e => ({
+    type: 'danger', icon: '🔴',
+    msg: `<strong>${e.patient}</strong> — IOP elevated (OD: ${e.iopOD}, OS: ${e.iopOS} mmHg). Review needed.`
+  }));
+  if (alerts.length === 0) {
+    if (alertsEmpty) alertsEmpty.style.display = '';
+    if (alertsList) alertsList.innerHTML = '';
+  } else {
+    if (alertsEmpty) alertsEmpty.style.display = 'none';
+    if (alertsList) alertsList.innerHTML = alerts.map(a =>
+      `<div class="alert alert-${a.type}"><span>${a.icon}</span><div>${a.msg}</div></div>`
+    ).join('');
+  }
+}
+
+
+// Dashboard dx chart
+function renderDxChart() {
+  const dxes = [['Glaucoma',22,'var(--accent)'],['Cataract',18,'#7c3aed'],['AMD',15,'var(--amber)'],['Diabetic',12,'var(--red)'],['Refractive',20,'var(--green)'],['Other',13,'var(--text3)']];
+  const el = document.getElementById('dx-chart');
+  if (!el) return;
+  el.innerHTML = dxes.map(([l,v,c]) => `
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+      <div style="width:8px;height:8px;border-radius:2px;background:${c};flex-shrink:0"></div>
+      <div style="flex:1;font-size:12.5px">${l}</div>
+      <div style="font-family:'DM Mono',monospace;font-size:11.5px;color:var(--text2)">${v}%</div>
+      <div style="width:70px;height:5px;background:var(--surface2);border-radius:2px"><div style="width:${v*3.3}px;height:5px;background:${c};border-radius:2px"></div></div>
+    </div>`).join('');
+}
+
+// ===================== SAVE / LOAD =====================
+const SAVE_FILENAME = 'OpticEMR-data.json';
+
+function saveToFile() {
+  const now = new Date();
+  const payload = {
+    version: '1.1',
+    savedAt: now.toISOString(),
+    practice: 'OpticEMR — Dr. Cyrille Cabrera',
+    data: {
+      patients: store.patients,
+      encounters: store.encounters,
+      exams: store.exams,
+      prescriptions: store.prescriptions,
+      surgical: store.surgical,
+    }
+  };
+  const json = JSON.stringify(payload, null, 2);
+  const blob = new Blob([json], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = SAVE_FILENAME;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  updateLastSaved(now);
+  setSaveStatus('✅ Saved — move to iCloud Drive → OpticEMR folder');
+}
+
+function loadFromFile(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const payload = JSON.parse(e.target.result);
+      if (!payload.data) throw new Error('Invalid file format');
+      const d = payload.data;
+      if (d.patients)      store.patients      = d.patients;
+      if (d.encounters)    store.encounters    = d.encounters;
+      if (d.exams)         store.exams         = d.exams;
+      if (d.prescriptions) store.prescriptions = d.prescriptions;
+      if (d.surgical)      store.surgical      = d.surgical;
+      refreshPatientDropdowns();
+      renderDxChart();
+      renderDashboard();
+      const activePage = document.querySelector('.page.active')?.id?.replace('page-','');
+      if (activePage === 'patients')      renderPatients();
+      if (activePage === 'encounters')    renderEncounters();
+      if (activePage === 'exams')         renderExams();
+      if (activePage === 'prescriptions') renderPrescriptions();
+      if (activePage === 'surgical')      renderSurgical();
+      if (activePage === 'reports')       renderReports();
+      if (payload.savedAt) updateLastSaved(new Date(payload.savedAt));
+      setSaveStatus('');
+      showToast(`✅ Data loaded — ${store.patients.length} patients, ${store.encounters.length} encounters`);
+    } catch(err) {
+      showToast('❌ Failed to load file. Make sure it is OpticEMR-data.json', true);
+    }
+    event.target.value = '';
+  };
+  reader.readAsText(file);
+}
+
+function updateLastSaved(date) {
+  const el = document.getElementById('last-saved-label');
+  if (!el) return;
+  const dateStr = date.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
+  const timeStr = date.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+  el.textContent = `Last saved: ${dateStr} ${timeStr}`;
+  el.style.color = 'var(--text2)';
+}
+
+function setSaveStatus(msg) {
+  const el = document.getElementById('save-status');
+  if (!el) return;
+  el.textContent = msg;
+  if (msg) setTimeout(() => { el.textContent = ''; }, 5000);
+}
+
+function showICloudGuide() {
+  document.getElementById('modal-icloud').style.display = 'flex';
+}
+
+function showToast(msg, isError) {
+  const toast = document.createElement('div');
+  toast.textContent = msg;
+  Object.assign(toast.style, {
+    position: 'fixed', bottom: '24px', left: '50%', transform: 'translateX(-50%)',
+    background: isError ? 'var(--red)' : '#1a2035',
+    color: '#fff', padding: '12px 24px', borderRadius: '8px',
+    fontSize: '13.5px', fontFamily: 'DM Sans, sans-serif',
+    boxShadow: '0 4px 20px rgba(0,0,0,0.25)',
+    zIndex: '9999', animation: 'fadeIn 0.2s ease',
+    whiteSpace: 'nowrap'
+  });
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 4000);
+}
+
+// ===================== INIT =====================
+document.addEventListener('DOMContentLoaded', () => {
+  refreshPatientDropdowns();
+  renderDxChart();
+  renderDashboard();
+});
+</script>
+<!-- iCloud Guide Modal -->
+<div class="modal-overlay" id="modal-icloud" style="display:none" onclick="closeModal('modal-icloud', event)">
+  <div class="modal" style="max-width:540px">
+    <div class="modal-header">
+      <div class="modal-title">☁️ iCloud Drive Setup Guide</div>
+      <button class="close-btn" onclick="closeModal('modal-icloud')">×</button>
+    </div>
+    <div class="modal-body" style="padding:20px 24px">
+
+      <div class="alert alert-info" style="margin-bottom:20px">
+        <span>ℹ️</span>
+        <div>Your data file is always named <strong>OpticEMR-data.json</strong>. Keep it in one iCloud Drive folder and it stays in sync across your Mac and iPad.</div>
+      </div>
+
+      <div class="section-title" style="margin-bottom:10px">Initial Setup (Mac)</div>
+      <ol style="padding-left:18px;font-size:13.5px;color:var(--text2);line-height:2">
+        <li>Open <strong>Finder</strong> → go to <strong>iCloud Drive</strong></li>
+        <li>Create a folder called <strong>OpticEMR</strong></li>
+        <li>Move <strong>ophtho-emr.html</strong> into that folder</li>
+        <li>Open the app from that folder in Safari or Chrome</li>
+      </ol>
+
+      <div class="divider"></div>
+
+      <div class="section-title" style="margin-bottom:10px">Saving (Mac & iPad)</div>
+      <ol style="padding-left:18px;font-size:13.5px;color:var(--text2);line-height:2">
+        <li>Click <strong>💾 Save</strong> — downloads <strong>OpticEMR-data.json</strong></li>
+        <li>On Mac: move the file to your <strong>iCloud Drive → OpticEMR</strong> folder<br><span style="font-size:12px;color:var(--text3)">(replace the old file when prompted)</span></li>
+        <li>On iPad: file saves to <strong>Files app → Downloads</strong> — move it to <strong>iCloud Drive → OpticEMR</strong></li>
+      </ol>
+
+      <div class="divider"></div>
+
+      <div class="section-title" style="margin-bottom:10px">Loading on iPad</div>
+      <ol style="padding-left:18px;font-size:13.5px;color:var(--text2);line-height:2">
+        <li>Open <strong>Files app</strong> → <strong>iCloud Drive → OpticEMR</strong></li>
+        <li>Tap <strong>ophtho-emr.html</strong> to open the app in Safari</li>
+        <li>Tap <strong>📂 Load</strong> → navigate to <strong>iCloud Drive → OpticEMR → OpticEMR-data.json</strong></li>
+        <li>Your records appear instantly</li>
+      </ol>
+
+      <div class="divider"></div>
+
+      <div class="section-title" style="margin-bottom:10px">Add to iPad Home Screen (optional)</div>
+      <ol style="padding-left:18px;font-size:13.5px;color:var(--text2);line-height:2">
+        <li>Open the app in Safari on iPad</li>
+        <li>Tap the <strong>Share</strong> button (↑ box icon)</li>
+        <li>Tap <strong>"Add to Home Screen"</strong></li>
+        <li>It launches like a native app — tap Load each session to restore data</li>
+      </ol>
+
+      <div class="divider"></div>
+
+      <div style="background:var(--surface2);border-radius:8px;padding:14px 16px;font-size:12.5px;color:var(--text2)">
+        <strong>🔮 Upgrading to NAS later</strong><br>
+        When you get a NAS, just tell your developer (or Claude) — only the Save/Load functions need updating. All your patient data in the JSON file transfers directly with no changes needed.
+      </div>
+
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" onclick="closeModal('modal-icloud')">Got it</button>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
